@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Loading...</title>
+
+  <style>
+    body {
+      background-color: white;
+      font-family: sans-serif;
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    /* body header style */
+    body header {
+      padding: 0px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    body header .meta {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 20px;
+    }
+
+    .meta-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        margin: 20px 0;
+    }
+
+    .meta-group {
+        display: flex;
+        gap: 40px;
+    }
+
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .meta-label {
+        font-size: 0.875rem;
+        color: #999;
+    }
+
+    .meta-value {
+        font-weight: bold;
+        color: #222;
+    }
+
+    .meta-tag {
+        padding: 6px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        white-space: nowrap;
+    }
+
+    body header .tag {
+      display: inline-block;
+      background-color: #eee;
+      border-radius: 5px;
+      padding: 3px 8px;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+  </style>
+
+  <!-- Marked.js for Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- MathJax for rendering LaTeX-style math -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+</head>
+
+<body>
+    <header>
+        <h1 id="dynamic-title">Loading title...</h1>
+
+        <div class="meta-bar">
+            <div class="meta-group">
+              <div class="meta-item">
+                <div class="meta-label">Author</div>
+                <div class="meta-value">Jingyi WAN</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Posted</div>
+                <div class="meta-value">12th November</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Read Time</div>
+                <div class="meta-value">5 Min</div>
+              </div>
+            </div>
+            <div class="meta-tag">Computer Vision</div>
+          </div>
+
+    </header>
+
+    <main>
+        <div id="markdown">Loading content...</div>
+    </main>
+
+    <script>
+        // 👉 替换为你的 raw markdown 文件链接：
+        const mdURL = 'https://raw.githubusercontent.com/Jingyi-Official/website/refs/heads/main/GPT%20series%20and%20Large%20Language%20Models%2018a3582c50b08010b683c56f8a82bb1e.md?token=GHSAT0AAAAAAC43JZ3LEHNLOQENNSZT26DSZ72Q7SA';
+
+        const fileName = mdURL.split('/').pop().replace('.md', '');
+        const imageBasePath = mdURL.substring(0, mdURL.lastIndexOf('/')) + '/' + fileName;
+
+        fetch(mdURL)
+        .then(res => res.text())
+        .then(md => {
+            const lines = md.split('\n');
+            let title = "Untitled";
+            let startIdx = 0;
+
+            for (let i = 0; i < lines.length; i++) {
+            const match = lines[i].match(/^#\s+(.*)/);
+            if (match) {
+                title = match[1];
+                startIdx = i + 1;
+                break;
+            }
+            }
+
+            document.title = title;
+            document.getElementById("dynamic-title").textContent = title;
+
+            const content = lines.slice(startIdx).join('\n');
+
+            const fixedContent = content.replace(/!\[([^\]]*)\]\(\.\/(.*?)\)/g, (match, alt, imgPath) => {
+            const imgURL = `${imageBasePath}/${imgPath}`;
+            return `![${alt}](${imgURL})`;
+            });
+
+            document.getElementById("markdown").innerHTML = marked.parse(fixedContent);
+
+            if (window.MathJax) MathJax.typesetPromise();
+        });
+    </script>
+</body>
+</html>

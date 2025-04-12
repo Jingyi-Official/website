@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Loading...</title>
+  <style>
+    body {
+      background-color: white;
+      font-family: 'Georgia', serif;
+      margin: 0;
+      padding: 0 20px;
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 20px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    nav {
+      float: right;
+    }
+
+    nav a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #444;
+      font-weight: bold;
+    }
+
+    .meta {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-top: 20px;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 20px auto;
+    }
+
+    footer {
+      border-top: 1px solid #ddd;
+      padding: 20px 0;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    .tag {
+      display: inline-block;
+      background-color: #eee;
+      border-radius: 5px;
+      padding: 3px 8px;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+</head>
+<body>
+
+
+  <main>
+    <h1 id="dynamic-title">Loading title...</h1>
+    <div class="meta">
+      <span>Author: Jingyi WAN., Fallecida</span> |
+      <span>Posted: 12th November</span> |
+      <span>Read Time: 5 Min</span> |
+      <span class="tag">Computer Vision</span>
+    </div>
+
+    <div id="markdown">Loading content...</div>
+  </main>
+
+
+  <script>
+    const mdURL = 'https://raw.githubusercontent.com/Jingyi-Official/website/refs/heads/main/GPT%20series%20and%20Large%20Language%20Models%2018a3582c50b08010b683c56f8a82bb1e.md?token=GHSAT0AAAAAAC43JZ3LEG3XONZN4Y3MPG3UZ72M3SA';
+
+    const cleanURL = mdURL.split('?')[0];
+    const fileName = cleanURL.split('/').pop().replace('.md', '');
+    const imageBasePath = cleanURL.substring(0, cleanURL.lastIndexOf('/')) + '/' + fileName;
+
+    fetch(mdURL)
+      .then(res => res.text())
+      .then(md => {
+        const lines = md.split('\n');
+        let title = "Untitled";
+        let startIdx = 0;
+
+        for (let i = 0; i < lines.length; i++) {
+          const match = lines[i].match(/^#\s+(.*)/);
+          if (match) {
+            title = match[1];
+            startIdx = i + 1;
+            break;
+          }
+        }
+
+        document.title = title;
+        document.getElementById("dynamic-title").textContent = title;
+
+        const content = lines.slice(startIdx).join('\n');
+
+        // 替换本地图片路径为 GitHub 上的完整 URL
+        const fixedContent = content.replace(/!\[([^\]]*)\]\(\.\/(.*?)\)/g, (match, alt, imgPath) => {
+          const imgURL = `${imageBasePath}/${imgPath}`;
+          return `![${alt}](${imgURL})`;
+        });
+
+        document.getElementById("markdown").innerHTML = marked.parse(fixedContent);
+        if (window.MathJax) MathJax.typesetPromise();
+      });
+  </script>
+</body>
+</html>
