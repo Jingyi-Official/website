@@ -1,7 +1,4 @@
 ## GPT series and Large Language Models
 - Tag: Large Language Models
-- Summary: Perry died Saturday in a hot tub at his Los Angeles home, law enforcement sources told the Los Angeles Times...
-
-## Revolutionizing Robotics with Self-Learning Systems
-- Tag: Robotics
-- Summary: This lecture introduces how self-learning systems enhance the autonomy of robotics...
+- Summary: This blog explores the evolution of artificial intelligence from Narrow AI to Artificial General Intelligence (AGI), with a focus on Large Language Models (LLMs) like GPT. A deep dive into the transformer architecture is provided, highlighting key concepts such as attention mechanisms, self-attention, multi-head attention, feed-forward networks, positional encoding, and layer normalization.  It outlines how models have advanced from task-specific designs to transformer-based architectures capable of handling diverse data types. The progression of GPT models is then traced from GPT-1 to GPT-4.
+- Link: https://jingyiwan.com/large-language-models
