@@ -63,17 +63,6 @@
       font-size: 13px;
     }
 
-    .index {
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    .subtext {
-      font-size: 13px;
-      text-transform: uppercase;
-      color: #666;
-    }
-
     .card h2 {
       font-size: 17px;
       font-weight: bold;
@@ -111,16 +100,13 @@
 </head>
 <body>
 
-  <div class="cards-container" id="cards-container">
-    <!-- Cards will be rendered here -->
-  </div>
+  <div class="cards-container" id="cards-container"></div>
 
   <script>
-    // 从 blog_list.md 中提取 Markdown 文本并解析为数据结构
     fetch('blog_list.md')
       .then(response => response.text())
       .then(markdown => {
-        const parsedData = parseMarkdown(markdown);
+        parsedData = parseMarkdown(markdown);
         initTags(parsedData);
         renderCards(parsedData);
       });
@@ -137,10 +123,8 @@
         });
         return {
           title,
-          lecture: data['Lecture'],
-          total: data['Total Lectures'],
-          tag: data['Tag'],
-          summary: data['Summary']
+          tag: data['Tag'] || 'Other',
+          summary: data['Summary'] || ''
         };
       });
     }
@@ -153,8 +137,6 @@
         const div = document.createElement('div');
         div.className = 'card';
         div.innerHTML = `
-          <div class="index">${item.lecture}RD</div>
-          <div class="subtext">Lecture out of ${item.total}</div>
           <h2>${item.title}</h2>
           <p>${item.summary}</p>
           <div class="continue">Continue reading</div>
@@ -185,7 +167,7 @@
       });
     }
 
-    let parsedData = []; // 全局缓存
+    let parsedData = [];
   </script>
 
 </body>
