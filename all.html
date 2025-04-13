@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lecture Blog</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: #f6f2ea;
+      margin: 0;
+      padding: 1rem;
+      color: #333;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tag-button {
+      padding: 0.4rem 1rem;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .tag-button.active {
+      border-color: black;
+      font-weight: bold;
+    }
+
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      padding: 1.5rem;
+      position: relative;
+      border-left: 6px solid #8b5c00;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .card .badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.3rem 0.75rem;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .index {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .subtext {
+      font-size: 13px;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    .card h2 {
+      font-size: 17px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #444;
+    }
+
+    .continue {
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .continue::before {
+      content: "+ ";
+      font-weight: bold;
+    }
+
+    @media (max-width: 500px) {
+      .card {
+        padding: 1rem;
+      }
+      .card h2 {
+        font-size: 16px;
+      }
+      .continue {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cards-container" id="cards-container">
+    <!-- Cards will be rendered here -->
+  </div>
+
+  <script>
+    // 从 blog_list.md 中提取 Markdown 文本并解析为数据结构
+    fetch('blog_list.md')
+      .then(response => response.text())
+      .then(markdown => {
+        const parsedData = parseMarkdown(markdown);
+        initTags(parsedData);
+        renderCards(parsedData);
+      });
+
+    function parseMarkdown(md) {
+      const sections = md.split('## ').filter(Boolean);
+      return sections.map(section => {
+        const lines = section.trim().split('\n');
+        const title = lines[0].trim();
+        const data = {};
+        lines.slice(1).forEach(line => {
+          const [key, ...rest] = line.replace('- ', '').split(':');
+          data[key.trim()] = rest.join(':').trim();
+        });
+        return {
+          title,
+          lecture: data['Lecture'],
+          total: data['Total Lectures'],
+          tag: data['Tag'],
+          summary: data['Summary']
+        };
+      });
+    }
+
+    function renderCards(data, filter = 'All') {
+      const container = document.getElementById('cards-container');
+      container.innerHTML = '';
+      data.filter(item => filter === 'All' || item.tag === filter)
+          .forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+          <div class="index">${item.lecture}RD</div>
+          <div class="subtext">Lecture out of ${item.total}</div>
+          <h2>${item.title}</h2>
+          <p>${item.summary}</p>
+          <div class="continue">Continue reading</div>
+          <div class="badge">${item.tag}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function initTags(data) {
+      const tagSet = new Set(data.map(item => item.tag));
+      const tagContainer = document.getElementById('tag-filters');
+      tagSet.forEach(tag => {
+        const btn = document.createElement('div');
+        btn.className = 'tag-button';
+        btn.dataset.tag = tag;
+        btn.textContent = tag;
+        tagContainer.appendChild(btn);
+      });
+
+      tagContainer.addEventListener('click', e => {
+        if (e.target.classList.contains('tag-button')) {
+          document.querySelectorAll('.tag-button').forEach(btn => btn.classList.remove('active'));
+          e.target.classList.add('active');
+          const tag = e.target.dataset.tag;
+          renderCards(parsedData, tag);
+        }
+      });
+    }
+
+    let parsedData = []; // 全局缓存
+  </script>
+
+</body>
+</html>
